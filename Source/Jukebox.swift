@@ -32,6 +32,7 @@ public protocol JukeboxDelegate: class {
     func jukeboxPlaybackProgressDidChange(_ jukebox : Jukebox)
     func jukeboxDidLoadItem(_ jukebox : Jukebox, item : JukeboxItem)
     func jukeboxDidUpdateMetadata(_ jukebox : Jukebox, forItem: JukeboxItem)
+    func jukeboxItemDidPlayToEnd(_ jukebox: Jukebox)
 }
 
 // MARK: - Public methods extension -
@@ -224,7 +225,7 @@ open class Jukebox: NSObject, JukeboxItemDelegate {
     fileprivate var backgroundIdentifier         =   UIBackgroundTaskInvalid
     fileprivate(set) open weak var delegate    :   JukeboxDelegate?
     
-    fileprivate (set) open var playIndex       =   0
+    public fileprivate (set) var playIndex       =   0
     fileprivate (set) open var queuedItems     :   [JukeboxItem]!
     fileprivate (set) open var state           =   State.ready {
         didSet {
@@ -252,7 +253,7 @@ open class Jukebox: NSObject, JukeboxItemDelegate {
     fileprivate var playerOperational: Bool {
         return player != nil && currentItem != nil
     }
-    
+
     // MARK:- Initializer -
     
     /**
@@ -482,6 +483,7 @@ open class Jukebox: NSObject, JukeboxItemDelegate {
         } else {
             play(atIndex: playIndex + 1)
         }
+        delegate?.jukeboxItemDidPlayToEnd(self)
     }
     
     func timerAction() {
